@@ -1,0 +1,167 @@
+============================================================
+QUESTION 3 – TOWER OF HANOI IN PROLOG
+============================================================
+
+QUESTION:
+---------
+Write a program in Prolog to solve Tower of Hanoi.
+
+
+============================================================
+SOFTWARE REQUIRED
+============================================================
+
+SWI-Prolog
+
+
+============================================================
+STEP 1 – CREATE THE PROLOG FILE
+============================================================
+
+Create a new file named:
+
+hanoi.pl
+
+Make sure the extension is .pl and NOT .txt.
+
+
+============================================================
+STEP 2 – ENTER THE PROGRAM
+============================================================
+
+Copy and paste this complete code into hanoi.pl:
+
+------------------------------------------------------------
+
+% ==========================================
+% TOWER OF HANOI IN PROLOG
+% ==========================================
+
+% Base case:
+% Move one disk directly from Source to Destination.
+
+hanoi(1, Source, Destination, _) :-
+    format('Move disk from ~w to ~w~n',
+           [Source, Destination]).
+
+% Recursive case:
+% Move N-1 disks to the temporary peg,
+% move the largest disk to destination,
+% then move N-1 disks to destination.
+
+hanoi(N, Source, Destination, Temp) :-
+    N > 1,
+    M is N - 1,
+    hanoi(M, Source, Temp, Destination),
+    format('Move disk from ~w to ~w~n',
+           [Source, Destination]),
+    hanoi(M, Temp, Destination, Source).
+
+------------------------------------------------------------
+
+
+============================================================
+STEP 3 – SAVE THE FILE
+============================================================
+
+Save as:
+
+hanoi.pl
+
+Example:
+
+C:\Users\YourName\Desktop\hanoi.pl
+
+
+============================================================
+STEP 4 – OPEN SWI-PROLOG
+============================================================
+
+Open SWI-Prolog.
+
+You should see:
+
+?-
+
+
+============================================================
+STEP 5 – LOAD THE PROGRAM
+============================================================
+
+Type:
+
+?- [hanoi].
+
+Press ENTER.
+
+Expected output:
+
+true.
+
+
+If the file is not in the current directory, use:
+
+?- consult('C:/Users/YourName/Desktop/hanoi.pl').
+
+
+============================================================
+STEP 6 – RUN THE PROGRAM
+============================================================
+
+The Tower of Hanoi program takes:
+
+hanoi(NumberOfDisks, Source, Destination, Temporary).
+
+
+For 3 disks, use:
+
+?- hanoi(3, left, right, center).
+
+Press ENTER.
+
+
+============================================================
+EXPECTED OUTPUT
+============================================================
+
+Move disk from left to right
+Move disk from left to center
+Move disk from right to center
+Move disk from left to right
+Move disk from center to left
+Move disk from center to right
+Move disk from left to right
+
+true.
+
+
+============================================================
+COMPLETE EXECUTION
+============================================================
+
+First type:
+
+?- [hanoi].
+
+Output:
+
+true.
+
+
+Then type:
+
+?- hanoi(3, left, right, center).
+
+Output:
+
+Move disk from left to right
+Move disk from left to center
+Move disk from right to center
+Move disk from left to right
+Move disk from center to left
+Move disk from center to right
+Move disk from left to right
+
+true.
+
+

@@ -1,0 +1,238 @@
+============================================================
+QUESTION 1(a) – SIMPLE FACTS AND QUERIES IN PROLOG
+============================================================
+
+QUESTION:
+---------
+Write a program in Prolog to implement simple facts and
+queries.
+
+Given:
+
+A. Ram likes mango.
+B. Seema is a girl.
+C. Bill likes Cindy.
+D. Rose is red.
+E. John owns gold.
+
+
+============================================================
+SOFTWARE REQUIRED
+============================================================
+
+SWI-Prolog
+
+
+============================================================
+STEP 1 – CREATE THE PROLOG FILE
+============================================================
+
+Create a new file named:
+
+prog1a.pl
+
+Make sure the extension is .pl and NOT .txt.
+
+
+============================================================
+STEP 2 – ENTER THE PROGRAM
+============================================================
+
+Copy and paste this complete code into prog1a.pl:
+
+------------------------------------------------------------
+
+% A. Ram likes mango.
+likes(ram, mango).
+
+% B. Seema is a girl.
+girl(seema).
+
+% C. Bill likes Cindy.
+likes(bill, cindy).
+
+% D. Rose is red.
+color(rose, red).
+
+% E. John owns gold.
+owns(john, gold).
+
+------------------------------------------------------------
+
+
+============================================================
+STEP 3 – SAVE THE FILE
+============================================================
+
+Save as:
+
+prog1a.pl
+
+Example:
+
+C:\Users\YourName\Desktop\prog1a.pl
+
+
+============================================================
+STEP 4 – OPEN SWI-PROLOG
+============================================================
+
+Open SWI-Prolog.
+
+You should see:
+
+?-
+
+
+============================================================
+STEP 5 – LOAD THE PROGRAM
+============================================================
+
+If the file is in the current directory, type:
+
+?- [prog1a].
+
+Press ENTER.
+
+Expected output:
+
+true.
+
+
+If the file is not in the current directory, use the full path.
+
+Example:
+
+?- consult('C:/Users/YourName/Desktop/prog1a.pl').
+
+
+============================================================
+STEP 6 – EXECUTE QUERIES
+============================================================
+
+QUERY 1:
+--------
+
+Type:
+
+?- likes(ram, X).
+
+Output:
+
+X = mango.
+
+
+------------------------------------------------------------
+
+QUERY 2:
+--------
+
+Type:
+
+?- owns(Y, gold).
+
+Output:
+
+Y = john.
+
+
+------------------------------------------------------------
+
+QUERY 3:
+--------
+
+Type:
+
+?- girl(seema).
+
+Output:
+
+true.
+
+
+------------------------------------------------------------
+
+QUERY 4:
+--------
+
+Type:
+
+?- color(rose, red).
+
+Output:
+
+true.
+
+
+------------------------------------------------------------
+
+QUERY 5:
+--------
+
+Type:
+
+?- likes(bill, cindy).
+
+Output:
+
+true.
+
+
+============================================================
+COMPLETE EXECUTION
+============================================================
+
+First:
+
+?- [prog1a].
+
+Output:
+
+true.
+
+
+Then:
+
+?- likes(ram, X).
+
+Output:
+
+X = mango.
+
+
+Then:
+
+?- owns(Y, gold).
+
+Output:
+
+Y = john.
+
+
+Then:
+
+?- girl(seema).
+
+Output:
+
+true.
+
+
+Then:
+
+?- color(rose, red).
+
+Output:
+
+true.
+
+
+Then:
+
+?- likes(bill, cindy).
+
+Output:
+
+true.
+
+

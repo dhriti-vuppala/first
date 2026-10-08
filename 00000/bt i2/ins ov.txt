@@ -1,0 +1,652 @@
+SOLIDITY ONLINE VOTING – COMPLETE PRACTICAL GUIDE
+==================================================
+
+GOAL:
+Create and run an Online Voting Smart Contract using:
+Solidity + Truffle + Ganache + VS Code
+
+
+1. SOFTWARE REQUIRED
+--------------------
+
+Required:
+- Node.js
+- npm
+- Truffle
+- Ganache
+- VS Code
+
+Check Node.js:
+
+node --version
+
+Check npm:
+
+npm --version
+
+Install Truffle if it is not installed:
+
+npm install -g truffle
+
+Check Truffle:
+
+truffle version
+
+NOTE:
+If you see a µWS compatibility warning, it is okay.
+It is only a performance warning.
+
+
+2. CREATE THE PROJECT
+---------------------
+
+Create a folder:
+
+OnlineVoting
+
+Open this folder in VS Code.
+
+Open:
+Terminal → New Terminal
+
+Run:
+
+truffle init
+
+This creates:
+
+OnlineVoting/
+├── contracts/
+├── migrations/
+├── test/
+└── truffle-config.js
+
+
+3. CREATE OnlineVoting.sol
+--------------------------
+
+Go to:
+
+contracts/
+
+Create:
+
+OnlineVoting.sol
+
+Paste the following code:
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.16;
+
+contract OnlineVoting {
+
+    struct Candidate {
+        uint id;
+        string name;
+        uint voteCount;
+    }
+
+    struct Voter {
+        bool voted;
+        uint vote;
+    }
+
+    address public admin;
+    uint public candidateCount;
+
+    mapping(uint => Candidate) public candidates;
+    mapping(address => Voter) public voters;
+
+    event CandidateAdded(
+        uint id,
+        string name
+    );
+
+    event VoteCasted(
+        address voter,
+        uint candidateId
+    );
+
+    constructor() {
+        admin = msg.sender;
+    }
+
+    function addCandidate(string memory _name) public {
+        require(
+            msg.sender == admin,
+            "Only admin can add candidates"
+        );
+
+        candidateCount++;
+
+        candidates[candidateCount] = Candidate(
+            candidateCount,
+            _name,
+            0
+        );
+
+        emit CandidateAdded(
+            candidateCount,
+            _name
+        );
+    }
+
+    function vote(uint _candidateId) public {
+        require(
+            !voters[msg.sender].voted,
+            "Already voted"
+        );
+
+        require(
+            _candidateId > 0 &&
+            _candidateId <= candidateCount,
+            "Invalid candidate"
+        );
+
+        voters[msg.sender].voted = true;
+        voters[msg.sender].vote = _candidateId;
+
+        candidates[_candidateId].voteCount++;
+
+        emit VoteCasted(
+            msg.sender,
+            _candidateId
+        );
+    }
+
+    function showCandidates()
+        public
+        view
+        returns (Candidate[] memory)
+    {
+        Candidate[] memory allCandidates =
+            new Candidate[](candidateCount);
+
+        for (uint i = 1; i <= candidateCount; i++) {
+            allCandidates[i - 1] = candidates[i];
+        }
+
+        return allCandidates;
+    }
+
+    function getWinner()
+        public
+        view
+        returns (string memory, uint)
+    {
+        uint maxVotes = 0;
+        string memory winner;
+
+        for (uint i = 1; i <= candidateCount; i++) {
+            if (candidates[i].voteCount > maxVotes) {
+                maxVotes = candidates[i].voteCount;
+                winner = candidates[i].name;
+            }
+        }
+
+        return (winner, maxVotes);
+    }
+}
+
+
+4. CREATE MIGRATION FILE
+------------------------
+
+Go to:
+
+migrations/
+
+Create:
+
+2_deploy_online_voting.js
+
+Paste:
+
+const OnlineVoting = artifacts.require("OnlineVoting");
+
+module.exports = function (deployer) {
+    deployer.deploy(OnlineVoting);
+};
+
+
+5. CONFIGURE truffle-config.js
+------------------------------
+
+Open:
+
+truffle-config.js
+
+Use this configuration:
+
+module.exports = {
+
+    networks: {
+        development: {
+            host: "127.0.0.1",
+            port: 7545,
+            network_id: "*",
+        },
+    },
+
+    compilers: {
+        solc: {
+            version: "0.8.19",
+        },
+    },
+
+};
+
+IMPORTANT:
+The Ganache port must match the port in truffle-config.js.
+
+For our setup:
+
+Ganache Port = 7545
+
+Solidity Compiler = 0.8.19
+
+
+6. START GANACHE
+----------------
+
+Open Ganache.
+
+Make sure Ganache is running.
+
+You should have accounts such as:
+
+Account 0
+Account 1
+Account 2
+Account 3
+Account 4
+...
+
+We will use:
+
+Account 0 = Admin / Contract Deployer
+Account 1 = Voter
+Account 2 = Voter
+Account 3 = Voter
+Account 4 = Voter
+
+
+7. COMPILE THE CONTRACT
+-----------------------
+
+Make sure you are inside the OnlineVoting project folder.
+
+In the NORMAL VS CODE TERMINAL, run:
+
+truffle compile
+
+Compilation must succeed before continuing.
+
+
+8. DEPLOY THE CONTRACT
+----------------------
+
+In the NORMAL VS CODE TERMINAL, run:
+
+truffle migrate --reset
+
+Successful deployment should show something similar to:
+
+Starting migrations...
+
+OnlineVoting: 0x............
+
+Summary
+=======
+> Total deployments: 1
+
+If you see network id 5777, that is okay for the Ganache setup we used.
+
+IMPORTANT:
+If migration fails, do not continue to the voting commands.
+Fix the migration problem first.
+
+
+9. OPEN TRUFFLE CONSOLE
+-----------------------
+
+In the NORMAL VS CODE TERMINAL, run:
+
+truffle console
+
+You should see:
+
+truffle(development)>
+
+IMPORTANT:
+From this point onward, the following commands are typed INSIDE:
+
+truffle(development)>
+
+Do NOT type them in the normal PowerShell/VS Code terminal.
+
+
+10. LOAD THE DEPLOYED CONTRACT
+------------------------------
+
+Inside:
+
+truffle(development)>
+
+type:
+
+let vote = await OnlineVoting.deployed()
+
+You may see:
+
+undefined
+
+THIS IS NORMAL.
+
+It means the contract was assigned to the variable "vote".
+
+To verify, type:
+
+vote
+
+You should see:
+
+TruffleContract { ... }
+
+That means the deployed contract is loaded successfully.
+
+
+11. ADD CANDIDATE 1 – ALICE
+---------------------------
+
+Type:
+
+await vote.addCandidate("Alice")
+
+You should get a transaction receipt containing:
+
+status: true
+
+and:
+
+event: 'CandidateAdded'
+
+This means:
+
+Candidate 1 = Alice
+
+IMPORTANT:
+Only the admin can add candidates.
+
+The account that deployed the contract is the admin.
+
+
+12. ADD CANDIDATE 2 – BOB
+-------------------------
+
+Type:
+
+await vote.addCandidate("Bob")
+
+Now:
+
+Candidate 1 = Alice
+Candidate 2 = Bob
+
+
+13. VOTE FOR ALICE
+------------------
+
+Account 1 votes for Candidate 1:
+
+await vote.vote(1, {from: accounts[1]})
+
+Meaning:
+
+Account 1 → Alice
+
+
+14. VOTE FOR BOB
+----------------
+
+Account 2 votes for Candidate 2:
+
+await vote.vote(2, {from: accounts[2]})
+
+Meaning:
+
+Account 2 → Bob
+
+
+15. VOTE FOR BOB AGAIN
+----------------------
+
+Account 3 votes for Candidate 2:
+
+await vote.vote(2, {from: accounts[3]})
+
+Meaning:
+
+Account 3 → Bob
+
+
+16. FINAL VOTE FOR BOB
+----------------------
+
+Account 4 votes for Candidate 2:
+
+await vote.vote(2, {from: accounts[4]})
+
+Meaning:
+
+Account 4 → Bob
+
+
+17. SHOW ALL CANDIDATES
+-----------------------
+
+Run:
+
+let all = await vote.showCandidates()
+
+You may see:
+
+undefined
+
+THIS IS NORMAL because the result is stored in the variable "all".
+
+Now type:
+
+all
+
+Expected output:
+
+[
+  [ '1', 'Alice', '1', id: '1', name: 'Alice', voteCount: '1' ],
+  [ '2', 'Bob', '3', id: '2', name: 'Bob', voteCount: '3' ]
+]
+
+Therefore:
+
+Alice → 1 vote
+Bob → 3 votes
+
+
+18. FIND THE WINNER
+-------------------
+
+Run:
+
+let winner = await vote.getWinner()
+
+You may see:
+
+undefined
+
+THIS IS NORMAL because the result is stored in "winner".
+
+Now type:
+
+winner
+
+Expected output:
+
+[ 'Bob', '3' ]
+
+Therefore:
+
+Winner = Bob
+Winning votes = 3
+
+
+19. FINAL RESULT
+----------------
+
+ONLINE VOTING RESULT
+
+Candidate 1: Alice
+Votes: 1
+
+Candidate 2: Bob
+Votes: 3
+
+Winner: Bob
+Winning Votes: 3
+
+
+20. COMPLETE COMMAND LIST
+-------------------------
+
+NORMAL VS CODE TERMINAL:
+
+truffle init
+
+truffle compile
+
+truffle migrate --reset
+
+truffle console
+
+
+TRUFFLE CONSOLE:
+
+let vote = await OnlineVoting.deployed()
+
+await vote.addCandidate("Alice")
+
+await vote.addCandidate("Bob")
+
+await vote.vote(1, {from: accounts[1]})
+
+await vote.vote(2, {from: accounts[2]})
+
+await vote.vote(2, {from: accounts[3]})
+
+await vote.vote(2, {from: accounts[4]})
+
+let all = await vote.showCandidates()
+
+all
+
+let winner = await vote.getWinner()
+
+winner
+
+
+21. IMPORTANT THINGS TO REMEMBER
+--------------------------------
+
+1. Start Ganache BEFORE running migration.
+
+2. Ganache port must match truffle-config.js.
+
+3. For our working setup:
+   Ganache port = 7545
+
+4. For our working setup:
+   Solidity compiler = 0.8.19
+
+5. "truffle compile" is run in the NORMAL terminal.
+
+6. "truffle migrate --reset" is run in the NORMAL terminal.
+
+7. "truffle console" is run in the NORMAL terminal.
+
+8. After "truffle console", you will see:
+
+   truffle(development)>
+
+9. Commands such as:
+
+   await vote.addCandidate("Alice")
+
+   are run INSIDE the Truffle console.
+
+10. "undefined" after commands such as:
+
+    let vote = await OnlineVoting.deployed()
+
+    is NORMAL.
+
+11. Account 0 is the admin/deployer.
+
+12. Account 1, 2, 3 and 4 are used as voters.
+
+13. One account cannot vote twice.
+
+14. If you run:
+
+    truffle migrate --reset
+
+    the contract is redeployed.
+
+    Therefore, you must add the candidates and cast the votes again.
+
+15. If compilation fails, STOP and fix compilation before migration.
+
+16. If migration fails, STOP and fix migration before opening the
+    voting console.
+
+
+22. COMPLETE FLOW TO MEMORIZE
+----------------------------
+
+Create project
+      ↓
+truffle init
+      ↓
+Create OnlineVoting.sol
+      ↓
+Create migration file
+      ↓
+Configure truffle-config.js
+      ↓
+Start Ganache
+      ↓
+truffle compile
+      ↓
+truffle migrate --reset
+      ↓
+truffle console
+      ↓
+let vote = await OnlineVoting.deployed()
+      ↓
+Add Alice
+      ↓
+Add Bob
+      ↓
+Cast votes
+      ↓
+showCandidates()
+      ↓
+getWinner()
+      ↓
+DONE
+
+
+FINAL EXPECTED RESULT:
+
+Alice → 1 vote
+Bob → 3 votes
+Winner → Bob
+Winning votes → 3

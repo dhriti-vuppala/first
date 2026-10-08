@@ -1,0 +1,764 @@
+SOLIDITY ONLINE SHOPPING – COMPLETE PRACTICAL GUIDE
+====================================================
+
+GOAL:
+Create and run an Online Shopping Smart Contract using:
+
+Solidity + Truffle + Ganache + VS Code
+
+
+1. SOFTWARE REQUIRED
+--------------------
+
+Required:
+
+- Node.js
+- npm
+- Truffle
+- Ganache
+- VS Code
+
+Check Node.js:
+
+node --version
+
+Check npm:
+
+npm --version
+
+Install Truffle if it is not installed:
+
+npm install -g truffle
+
+Check Truffle:
+
+truffle version
+
+NOTE:
+If you see a µWS compatibility warning, it is okay.
+It is only a performance warning.
+
+
+2. CREATE THE PROJECT
+---------------------
+
+Create a folder:
+
+OnlineShop
+
+Open this folder in VS Code.
+
+Open:
+
+Terminal → New Terminal
+
+Run:
+
+truffle init
+
+This creates:
+
+OnlineShop/
+├── contracts/
+├── migrations/
+├── test/
+└── truffle-config.js
+
+
+3. CREATE OnlineShop.sol
+------------------------
+
+Go to:
+
+contracts/
+
+Create:
+
+OnlineShop.sol
+
+Paste the following code:
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.16;
+
+contract OnlineShop {
+
+    struct Product {
+        uint id;
+        string name;
+        uint price;
+        address payable seller;
+        bool sold;
+    }
+
+    uint public productCount;
+
+    mapping(uint => Product) public products;
+
+    event ProductAdded(
+        uint id,
+        string name,
+        uint price,
+        address seller
+    );
+
+    event ProductBought(
+        uint id,
+        address buyer,
+        uint price
+    );
+
+    function addProduct(
+        string memory _name,
+        uint _price
+    ) public {
+
+        productCount++;
+
+        products[productCount] = Product(
+            productCount,
+            _name,
+            _price,
+            payable(msg.sender),
+            false
+        );
+
+        emit ProductAdded(
+            productCount,
+            _name,
+            _price,
+            msg.sender
+        );
+    }
+
+    function buyProduct(uint _id) public payable {
+
+        Product storage product = products[_id];
+
+        require(
+            _id > 0 && _id <= productCount,
+            "Invalid product"
+        );
+
+        require(
+            !product.sold,
+            "Product already sold"
+        );
+
+        require(
+            msg.value == product.price,
+            "Incorrect payment"
+        );
+
+        product.sold = true;
+
+        product.seller.transfer(msg.value);
+
+        emit ProductBought(
+            _id,
+            msg.sender,
+            msg.value
+        );
+
+        productCount--;
+    }
+
+    function showProducts()
+        public
+        view
+        returns (Product[] memory)
+    {
+        Product[] memory allProducts =
+            new Product[](productCount);
+
+        uint index = 0;
+
+        for (uint i = 1; i <= productCount; i++) {
+
+            if (!products[i].sold) {
+
+                allProducts[index] = products[i];
+
+                index++;
+            }
+        }
+
+        return allProducts;
+    }
+}
+
+
+IMPORTANT:
+
+The file must be:
+
+contracts/OnlineShop.sol
+
+Make sure it is NOT:
+
+OnlineShop.sol.txt
+
+and NOT outside the contracts folder.
+
+
+4. CREATE MIGRATION FILE
+------------------------
+
+Go to:
+
+migrations/
+
+Create:
+
+2_deploy_online_shop.js
+
+Paste:
+
+const OnlineShop = artifacts.require("OnlineShop");
+
+module.exports = function (deployer) {
+    deployer.deploy(OnlineShop);
+};
+
+
+5. CONFIGURE truffle-config.js
+------------------------------
+
+Open:
+
+truffle-config.js
+
+Use:
+
+module.exports = {
+
+    networks: {
+        development: {
+            host: "127.0.0.1",
+            port: 7545,
+            network_id: "*",
+        },
+    },
+
+    compilers: {
+        solc: {
+            version: "0.8.19",
+        },
+    },
+
+};
+
+IMPORTANT:
+
+The Ganache port must match the port in truffle-config.js.
+
+For our setup:
+
+Ganache Port = 7545
+
+Solidity Compiler = 0.8.19
+
+
+6. START GANACHE
+----------------
+
+Open Ganache.
+
+Make sure Ganache is running.
+
+You should see accounts such as:
+
+Account 0
+Account 1
+Account 2
+Account 3
+Account 4
+...
+
+For this practical, we can use:
+
+Account 0 = Seller / Product owner
+Account 1 = Buyer
+
+The exact account addresses will be different on your computer.
+
+
+7. COMPILE THE CONTRACT
+-----------------------
+
+Make sure you are inside the OnlineShop project folder.
+
+In the NORMAL VS CODE TERMINAL, run:
+
+truffle compile
+
+Compilation must succeed before continuing.
+
+
+8. DEPLOY THE CONTRACT
+----------------------
+
+In the NORMAL VS CODE TERMINAL, run:
+
+truffle migrate --reset
+
+Successful deployment should show something similar to:
+
+Starting migrations...
+
+OnlineShop: 0x............
+
+Summary
+=======
+> Total deployments: 1
+
+If you see network id 5777, that is okay for the Ganache setup we used.
+
+IMPORTANT:
+
+If migration fails, do not continue.
+
+Fix the migration problem first.
+
+
+9. OPEN TRUFFLE CONSOLE
+-----------------------
+
+In the NORMAL VS CODE TERMINAL, run:
+
+truffle console
+
+You should see:
+
+truffle(development)>
+
+IMPORTANT:
+
+From this point onward, commands are typed INSIDE:
+
+truffle(development)>
+
+Do NOT type them in the normal PowerShell/VS Code terminal.
+
+
+10. LOAD THE DEPLOYED CONTRACT
+------------------------------
+
+Inside:
+
+truffle(development)>
+
+type:
+
+let shop1 = await OnlineShop.deployed()
+
+You may see:
+
+undefined
+
+THIS IS NORMAL.
+
+It means the deployed contract was assigned to the variable shop1.
+
+To verify, type:
+
+shop1
+
+You should see:
+
+TruffleContract { ... }
+
+That means the deployed OnlineShop contract is loaded successfully.
+
+
+11. ADD FIRST PRODUCT – SHOES
+-----------------------------
+
+Type:
+
+await shop1.addProduct(
+    "Shoes",
+    web3.utils.toWei("0.5", "ether")
+)
+
+This adds:
+
+Product 1 = Shoes
+Price = 0.5 ETH
+
+
+12. ADD SECOND PRODUCT – LAPTOP
+-------------------------------
+
+Type:
+
+await shop1.addProduct(
+    "Laptop",
+    web3.utils.toWei("0.5", "ether")
+)
+
+This adds:
+
+Product 2 = Laptop
+Price = 0.5 ETH
+
+
+13. ADD THIRD PRODUCT – WATCH
+-----------------------------
+
+Type:
+
+await shop1.addProduct(
+    "watch",
+    web3.utils.toWei("0.5", "ether")
+)
+
+This adds:
+
+Product 3 = watch
+Price = 0.5 ETH
+
+
+14. SHOW ALL PRODUCTS
+---------------------
+
+Run:
+
+let all = await shop1.showProducts()
+
+You may see:
+
+undefined
+
+THIS IS NORMAL because the result is stored in "all".
+
+Now type:
+
+all
+
+You should see the products.
+
+They will contain information such as:
+
+id
+name
+price
+seller
+sold
+
+You should have approximately:
+
+Product 1 → Shoes → 0.5 ETH
+Product 2 → Laptop → 0.5 ETH
+Product 3 → watch → 0.5 ETH
+
+
+15. BUY THE SHOES
+----------------
+
+Account 1 will buy Product 1.
+
+Type:
+
+await shop1.buyProduct(
+    1,
+    {
+        from: accounts[1],
+        value: web3.utils.toWei("0.5", "ether")
+    }
+)
+
+Meaning:
+
+Product ID = 1
+Product = Shoes
+Buyer = Account 1
+Payment = 0.5 ETH
+
+The transaction should succeed.
+
+You should see:
+
+status: true
+
+This means the purchase was successful.
+
+
+16. SHOW PRODUCTS AGAIN
+-----------------------
+
+Run:
+
+all = await shop1.showProducts()
+
+Then:
+
+all
+
+This lets you check the products after the purchase.
+
+IMPORTANT:
+
+The OnlineShop contract supplied for this lab changes productCount
+when a product is bought.
+
+Therefore, the output may not behave exactly like a normal
+real-world shopping application.
+
+For your lab, follow the provided contract and demonstrate the
+transaction/output.
+
+
+17. FINAL RESULT
+----------------
+
+Before purchase:
+
+Product 1 → Shoes → 0.5 ETH
+Product 2 → Laptop → 0.5 ETH
+Product 3 → watch → 0.5 ETH
+
+Purchase:
+
+Account 1 buys Product 1 (Shoes)
+
+Payment:
+
+0.5 ETH
+
+Transaction:
+
+Successful
+
+
+18. COMPLETE COMMAND LIST
+-------------------------
+
+NORMAL VS CODE TERMINAL:
+
+truffle init
+
+truffle compile
+
+truffle migrate --reset
+
+truffle console
+
+
+TRUFFLE CONSOLE:
+
+let shop1 = await OnlineShop.deployed()
+
+await shop1.addProduct(
+    "Shoes",
+    web3.utils.toWei("0.5", "ether")
+)
+
+await shop1.addProduct(
+    "Laptop",
+    web3.utils.toWei("0.5", "ether")
+)
+
+await shop1.addProduct(
+    "watch",
+    web3.utils.toWei("0.5", "ether")
+)
+
+let all = await shop1.showProducts()
+
+all
+
+await shop1.buyProduct(
+    1,
+    {
+        from: accounts[1],
+        value: web3.utils.toWei("0.5", "ether")
+    }
+)
+
+all = await shop1.showProducts()
+
+all
+
+
+19. IMPORTANT THINGS TO REMEMBER
+--------------------------------
+
+1. Start Ganache BEFORE running migration.
+
+2. Ganache port must match truffle-config.js.
+
+3. For our working setup:
+
+   Ganache port = 7545
+
+4. For our working setup:
+
+   Solidity compiler = 0.8.19
+
+5. "truffle compile" is run in the NORMAL terminal.
+
+6. "truffle migrate --reset" is run in the NORMAL terminal.
+
+7. "truffle console" is run in the NORMAL terminal.
+
+8. After "truffle console", you will see:
+
+   truffle(development)>
+
+9. Commands such as:
+
+   await shop1.addProduct(...)
+
+   are run INSIDE the Truffle console.
+
+10. "undefined" after:
+
+    let shop1 = await OnlineShop.deployed()
+
+    is NORMAL.
+
+11. "undefined" after:
+
+    let all = await shop1.showProducts()
+
+    is also NORMAL.
+
+    Type:
+
+    all
+
+    to see the actual result.
+
+12. Product prices are given in Wei internally.
+
+13. We use:
+
+    web3.utils.toWei("0.5", "ether")
+
+    to convert 0.5 ETH into Wei.
+
+14. When buying a product, the payment must match the
+    product price.
+
+15. Account 1 is used as the buyer in this practical.
+
+16. If you run:
+
+    truffle migrate --reset
+
+    the contract is redeployed.
+
+    Therefore, start the product-adding steps again.
+
+17. If compilation fails, STOP and fix compilation before migration.
+
+18. If migration fails, STOP and fix migration before opening
+    the Truffle console.
+
+
+20. UNDERSTANDING THE IMPORTANT COMMANDS
+---------------------------------------
+
+ADD PRODUCT:
+
+await shop1.addProduct(
+    "Shoes",
+    web3.utils.toWei("0.5", "ether")
+)
+
+Meaning:
+
+Add a product named Shoes.
+Price = 0.5 ETH.
+
+
+BUY PRODUCT:
+
+await shop1.buyProduct(
+    1,
+    {
+        from: accounts[1],
+        value: web3.utils.toWei("0.5", "ether")
+    }
+)
+
+Meaning:
+
+Buy product with ID 1.
+
+The buyer is Account 1.
+
+Send 0.5 ETH as payment.
+
+
+SHOW PRODUCTS:
+
+let all = await shop1.showProducts()
+
+Then:
+
+all
+
+Meaning:
+
+Get all products and display them.
+
+
+21. COMPLETE FLOW TO MEMORIZE
+----------------------------
+
+Create project
+      ↓
+truffle init
+      ↓
+Create OnlineShop.sol
+      ↓
+Create migration file
+      ↓
+Configure truffle-config.js
+      ↓
+Start Ganache
+      ↓
+truffle compile
+      ↓
+truffle migrate --reset
+      ↓
+truffle console
+      ↓
+let shop1 = await OnlineShop.deployed()
+      ↓
+Add Shoes
+      ↓
+Add Laptop
+      ↓
+Add watch
+      ↓
+showProducts()
+      ↓
+Account 1 buys Shoes
+      ↓
+showProducts() again
+      ↓
+DONE
+
+
+FINAL PRACTICAL RESULT:
+
+Products added:
+
+1. Shoes  → 0.5 ETH
+2. Laptop → 0.5 ETH
+3. watch  → 0.5 ETH
+
+Purchase:
+
+Account 1 → buys Shoes
+
+Payment:
+
+0.5 ETH
+
+Transaction:
+
+SUCCESS

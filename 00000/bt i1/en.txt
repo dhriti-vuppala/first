@@ -1,0 +1,423 @@
+============================================================
+SOLIDITY ENUM PROGRAM
+============================================================
+
+AIM:
+To write and execute a Solidity program to demonstrate the use of enum.
+
+SOFTWARE REQUIRED:
+1. Remix IDE
+2. Solidity Compiler
+3. Remix VM (Cancun)
+
+============================================================
+PROGRAM
+============================================================
+
+STEP 1: OPEN REMIX IDE
+
+Open the following website:
+
+https://remix.ethereum.org/
+
+Wait for Remix IDE to load.
+
+
+============================================================
+STEP 2: CREATE A SOLIDITY FILE
+============================================================
+
+1. On the left side, click "File Explorer".
+2. Open the "contracts" folder.
+3. Click the "+" button / New File.
+4. Create a file named:
+
+SimpleEnumExample.sol
+
+5. Open the file.
+
+
+============================================================
+STEP 3: ENTER THE SOLIDITY CODE
+============================================================
+
+Copy and paste the following complete code into
+SimpleEnumExample.sol:
+
+
+------------------------------------------------------------
+CODE START
+------------------------------------------------------------
+
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity 0.8.30;
+
+contract SimpleEnumExample {
+
+    // Define an enum for order status
+    enum OrderStatus {
+        Pending,
+        Confirmed,
+        Shipped,
+        Delivered,
+        Cancelled
+    }
+
+    // State variable using the enum
+    OrderStatus public currentStatus;
+
+    // Set initial status in constructor
+    constructor() {
+        currentStatus = OrderStatus.Pending;
+    }
+
+    // Function to update status
+    function updateStatus(OrderStatus _newStatus) public {
+        currentStatus = _newStatus;
+    }
+
+    // Get Status Strings
+    function getStatusString()
+        public
+        view
+        returns (string memory)
+    {
+        if (currentStatus == OrderStatus.Pending)
+            return "Pending";
+
+        if (currentStatus == OrderStatus.Confirmed)
+            return "Confirmed";
+
+        if (currentStatus == OrderStatus.Shipped)
+            return "Shipped";
+
+        if (currentStatus == OrderStatus.Delivered)
+            return "Delivered";
+
+        if (currentStatus == OrderStatus.Cancelled)
+            return "Cancelled";
+
+        return "Unknown";
+    }
+
+    // Get current status as uint
+    function getStatusNumber() public view returns (uint) {
+        return uint(currentStatus);
+    }
+}
+
+------------------------------------------------------------
+CODE END
+------------------------------------------------------------
+
+
+The enum contains five possible values:
+
+Pending    = 0
+Confirmed  = 1
+Shipped    = 2
+Delivered  = 3
+Cancelled  = 4
+
+These values are in the same order as the uploaded program.
+
+
+============================================================
+STEP 4: SAVE THE FILE
+============================================================
+
+Press:
+
+CTRL + S
+
+or allow Remix to automatically save the file.
+
+
+============================================================
+STEP 5: COMPILE THE PROGRAM
+============================================================
+
+1. On the left side, click the "Solidity Compiler" icon.
+
+2. Select compiler version:
+
+0.8.30
+
+IMPORTANT:
+The program uses:
+
+pragma solidity 0.8.30;
+
+Therefore select compiler version 0.8.30.
+
+3. Make sure the selected file is:
+
+SimpleEnumExample.sol
+
+4. Click:
+
+Compile SimpleEnumExample.sol
+
+5. If compilation is successful, you should see a green
+check mark / successful compilation message.
+
+
+============================================================
+STEP 6: OPEN DEPLOY & RUN TRANSACTIONS
+============================================================
+
+1. On the left side, click:
+
+"Deploy & Run Transactions"
+
+2. In Environment, select:
+
+Remix VM (Cancun)
+
+3. In the Contract dropdown, select:
+
+SimpleEnumExample
+
+4. Leave all other settings as default.
+
+5. Click:
+
+Deploy
+
+
+============================================================
+STEP 7: OPEN THE DEPLOYED CONTRACT
+============================================================
+
+After deployment, scroll down to:
+
+Deployed Contracts
+
+You should see:
+
+SimpleEnumExample
+
+Click the arrow beside it to expand the contract.
+
+You will see functions such as:
+
+currentStatus
+getStatusNumber
+getStatusString
+updateStatus
+
+
+============================================================
+STEP 8: CHECK THE INITIAL STATUS
+============================================================
+
+The constructor automatically sets:
+
+currentStatus = OrderStatus.Pending;
+
+This is present in the original program.
+
+Now click:
+
+currentStatus
+
+Expected output:
+
+0
+
+This means:
+
+0 = Pending
+
+
+============================================================
+STEP 9: CHECK STATUS USING getStatusString()
+============================================================
+
+Click:
+
+getStatusString
+
+Expected output:
+
+Pending
+
+
+============================================================
+STEP 10: CHECK STATUS USING getStatusNumber()
+============================================================
+
+Click:
+
+getStatusNumber
+
+Expected output:
+
+0
+
+
+============================================================
+STEP 11: CHANGE STATUS TO CONFIRMED
+============================================================
+
+Find:
+
+updateStatus
+
+It will show an input box.
+
+Enter:
+
+1
+
+Then click:
+
+transact
+
+
+Now click:
+
+getStatusString
+
+Expected output:
+
+Confirmed
+
+
+Click:
+
+getStatusNumber
+
+Expected output:
+
+1
+
+
+Therefore:
+
+1 = Confirmed
+
+
+============================================================
+STEP 12: CHANGE STATUS TO SHIPPED
+============================================================
+
+In updateStatus, enter:
+
+2
+
+Click:
+
+transact
+
+
+Now click:
+
+getStatusString
+
+Expected output:
+
+Shipped
+
+
+Click:
+
+getStatusNumber
+
+Expected output:
+
+2
+
+
+Therefore:
+
+2 = Shipped
+
+
+============================================================
+STEP 13: CHANGE STATUS TO DELIVERED
+============================================================
+
+In updateStatus, enter:
+
+3
+
+Click:
+
+transact
+
+
+Now click:
+
+getStatusString
+
+Expected output:
+
+Delivered
+
+
+Click:
+
+getStatusNumber
+
+Expected output:
+
+3
+
+
+Therefore:
+
+3 = Delivered
+
+
+============================================================
+STEP 14: CHANGE STATUS TO CANCELLED
+============================================================
+
+In updateStatus, enter:
+
+4
+
+Click:
+
+transact
+
+
+Now click:
+
+getStatusString
+
+Expected output:
+
+Cancelled
+
+
+Click:
+
+getStatusNumber
+
+Expected output:
+
+4
+
+
+Therefore:
+
+4 = Cancelled
+
+
+============================================================
+FINAL OUTPUT / OBSERVATION
+============================================================
+
+The Solidity enum successfully represents the order status.
+
+The status values are:
+
+0 = Pending
+1 = Confirmed
+2 = Shipped
+3 = Delivered
+4 = Cancelled
+
+

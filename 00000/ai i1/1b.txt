@@ -1,0 +1,207 @@
+============================================================
+QUESTION 1(b) – SIMPLE ARITHMETIC IN PROLOG
+============================================================
+
+QUESTION:
+---------
+Write a program in Prolog to implement simple arithmetic.
+
+
+============================================================
+SOFTWARE REQUIRED
+============================================================
+
+SWI-Prolog
+
+
+============================================================
+STEP 1 – CREATE THE PROLOG FILE
+============================================================
+
+Create a new file named:
+
+prog1b.pl
+
+Make sure the extension is .pl and NOT .txt.
+
+
+============================================================
+STEP 2 – ENTER THE PROGRAM
+============================================================
+
+Copy and paste this complete code into prog1b.pl:
+
+------------------------------------------------------------
+
+% Define addition
+calculate(X, '+', Y, Result) :-
+    Result is X + Y.
+
+% Define subtraction
+calculate(X, '-', Y, Result) :-
+    Result is X - Y.
+
+% Define multiplication
+calculate(X, '*', Y, Result) :-
+    Result is X * Y.
+
+% Define division
+calculate(X, '/', Y, Result) :-
+    Y =\= 0,
+    Result is X / Y.
+
+------------------------------------------------------------
+
+
+============================================================
+STEP 3 – SAVE THE FILE
+============================================================
+
+Save as:
+
+prog1b.pl
+
+Example:
+
+C:\Users\YourName\Desktop\prog1b.pl
+
+
+============================================================
+STEP 4 – OPEN SWI-PROLOG
+============================================================
+
+Open SWI-Prolog.
+
+You should see:
+
+?-
+
+
+============================================================
+STEP 5 – LOAD THE PROGRAM
+============================================================
+
+Type:
+
+?- [prog1b].
+
+Press ENTER.
+
+Expected output:
+
+true.
+
+
+If the file is not in the current directory, use:
+
+?- consult('C:/Users/YourName/Desktop/prog1b.pl').
+
+
+============================================================
+STEP 6 – EXECUTE THE PROGRAM
+============================================================
+
+
+1. ADDITION
+-----------
+
+Type:
+
+?- calculate(10, '+', 5, R).
+
+Output:
+
+R = 15.
+
+
+------------------------------------------------------------
+
+2. SUBTRACTION
+--------------
+
+Type:
+
+?- calculate(8, '-', 3, R).
+
+Output:
+
+R = 5.
+
+
+------------------------------------------------------------
+
+3. MULTIPLICATION
+-----------------
+
+Type:
+
+?- calculate(4, '*', 6, R).
+
+Output:
+
+R = 24.
+
+
+------------------------------------------------------------
+
+4. DIVISION
+-----------
+
+Type:
+
+?- calculate(20, '/', 4, R).
+
+Output:
+
+R = 5.0.
+
+
+============================================================
+COMPLETE EXECUTION
+============================================================
+
+First:
+
+?- [prog1b].
+
+Output:
+
+true.
+
+
+Then:
+
+?- calculate(10, '+', 5, R).
+
+Output:
+
+R = 15.
+
+
+Then:
+
+?- calculate(8, '-', 3, R).
+
+Output:
+
+R = 5.
+
+
+Then:
+
+?- calculate(4, '*', 6, R).
+
+Output:
+
+R = 24.
+
+
+Then:
+
+?- calculate(20, '/', 4, R).
+
+Output:
+
+R = 5.0.
+
+
